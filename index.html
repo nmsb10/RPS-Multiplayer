@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>rock paper scissors | multiplayer</title>
+	<link rel="stylesheet" type="text/css" href="./assets/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+	<link rel="stylesheet" type="text/css" href="./assets/css/stylerpsmultiplayer.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- LINK TO FIREBASE GOES HERE -->
+	<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
+</head>
+
+<body>
+<!-- wrapper for the sticky footer -->
+<div class="wrapper">
+	<div class="horizontal-section" id="middle-section">
+		<div class="good-fit" style="font-size:0;">
+			<div id="main-title">
+				Rock Paper Scissors
+			</div>
+			<div id="player-status">
+			<!-- remember: use a form so you can press enter instead of needing to actually press the button -->
+				<form>
+					<input type = "text" id="name-input" placeholder="what is your name?">
+					<input id = "add-player" type = "submit" value = "Start">
+				</form>
+			</div>
+			<div id="game-content">
+				<div class='game-box' id="game-content-firstplayer">
+					waiting for player 1
+				</div>
+				<div class='game-box' id='win-status'>
+				prepare to win!
+				</div>
+				<div class='game-box' id='game-content-secondplayer'>
+					waiting for player 2
+				</div>
+			</div>
+			<div id="game-messaging">
+				<div id="message-display">
+					<div id="message-display-start">
+					</div>
+				</div>
+				<form id='communication-bar'>
+					<input type="text" id="message-input">
+					<input id = "add-message" type = "submit" value = "Send">
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="push"></div> <!-- push class for the sticky footer -->
+</div><!-- /wrapper -->
+<div class="horizontal-section">
+	<footer>
+		<div class="good-fit">
+			<div id="footer-content">
+				Copyright &copy; 2016 <a class="footer-link" href="https://www.linkedin.com/in/jonathonnagatani" target="_blank" title="Jonathon on LinkedIn">Jonathon Nagatani</a>. All Rights Reserved.
+			</div>
+		</div>
+	</footer>
+
+
+<!-- should load the javascript after the DOM, because the DOM needs to be painted first, so THEN the javascript can change the painted DOM-->
+<script src="https://code.jquery.com/jquery-2.2.3.js" integrity="sha256-laXWtGydpwqJ8JA+X9x2miwmaiKhn8tVmOVEigRNtP4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="./assets/javascript/rpsmultiplayer.js"></script>
+</body>
+</html>

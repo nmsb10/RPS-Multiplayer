@@ -1,0 +1,386 @@
+html, body{
+	/* height: 100% for the ryanfait sticky footer */
+	height: 100%;
+}
+
+/*https://rush.uber.com/enterprise*/
+/*https://www.chase.com/*/
+
+body{
+	/*http://www.w3schools.com/colors/colors_picker.asp*/
+	/*http://www.w3schools.com/cssref/css_units.asp*/
+	/*http://www.w3schools.com/css/css_align.asp*/
+	background: url("../images/one.JPG");
+	background-repeat: no-repeat;
+	/*background color for areas not covered by background image*/
+	/* these rgba values correspond to background-color: #404040
+	final number indicates opacity; 0 = invisible, 1 = opaque*/
+	/*Hexadecimal: #4E2A84*/
+	background-color: rgba(78, 42, 132,1);
+	background-size: 100%;	
+}
+
+.horizontal-section{
+	/*display block should put these elements each on their own "separate line."
+	display: inline-block puts all elements on the same line as long as the
+	widths let the elements fit. If the width of an element puts it over the max
+	width, then the next element automatically begins on the next lower "row"*/	
+	display: block;
+	width: 100%;
+	padding: 0px;
+	border: 0px;
+	margin: 0px;
+}
+
+.good-fit{
+	width: 80%;
+	padding: 0px;
+	border: 0px;
+	/*left and right margins equal to auto centers this content*/
+	margin: 0 auto;
+/*	margin-left:10%;
+	margin-right:10%;
+	left:0px;
+	right:0px;
+	max-width: 960px;
+	position: relative;*/
+}
+
+header{
+	background: rgba(0,0,0,0.45);
+	/*http://www.w3schools.com/css/css3_gradients.asp*/
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0)); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0)); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0)); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.65), rgba(0,0,0,0)); /* Standard syntax (must be last) */
+	/*position fixed is positioned relative to the viewport,
+	which means it always stays in the same place even if the
+	page is scrolled. The top, right, bottom, and left properties
+	are used to position the element.*/
+	/*position absolute is positioned relative to the nearest
+	positioned ancestor (instead of positioned relative to the
+	viewport, like fixed). However; if an absolute positioned
+	element has no positioned ancestors, it uses the document
+	body, and moves along with page scrolling.*/
+	position: fixed;
+	width: 100%;
+}
+
+/*using * means the header and all children have this property(ies)*/
+header *{
+	/*the width and height properties (and min/max properties) includes
+	content, padding and border, but not the margin*/
+	/*box-sizing: border-box;*/
+}
+
+.header-section{
+	/*pete prefers to use inline-block, rarely uses inline?*/
+	/*display inline, when all 3 divs equal 100%, the 3rd div will
+	not fit and therefore go below the 1st div. This is due to the browser
+	taking into account the white-space in the html.
+	Must remove the white-space between the divs to make this
+	work as expected.*/
+	/*accomplished with in-line css of font-size:0 for the parent div*/
+	/*but don't forget, with the font-size: 0 fix, you MUST define font
+	sizes for all children of that parent div!*/	
+	display: inline-block;
+	width: 35%;
+	/*this centers the content vertically
+	http://www.w3schools.com/cssref/pr_pos_vertical-align.asp*/
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.header-section-center{
+	width: 30%;
+	text-align: center;
+}
+
+.header-section-left{
+	text-align: right;
+}
+
+.header-section-right{
+	text-align: left;
+}
+
+#center-name{
+	font-family: 'Georgia', Times, "Times New Roman", serif;
+	font-size: 25px;
+	font-weight: 700;
+	color: rgba(255,255,255,1);
+	letter-spacing: 5px;
+	padding: 0.5em 0em;
+	/*want display inline-block so parent div registers this a's padding*/
+	display: inline-block;
+/*	margin:auto;	
+	text-align:center;*/
+}
+
+#center-name:link, #center-name:visited, #center-name:active{
+	text-decoration: none;
+}
+
+.header-link{
+	font-family: "Helvetica", 'Helvetica Neue', Arial, sans-serif;
+	font-size: 15px;
+	font-weight: 300;
+	border-radius: 7px;
+	margin: 0px 15px;
+}
+
+.header-link:link, .header-link:visited, .header-link:active{
+	text-decoration: none;
+	color: rgba(230,230,230,1);
+}
+
+.header-link:hover{
+	font-size: 17px;
+	background-color: rgba(230,230,230,0.3);
+	/*color:purple;*/
+	color: rgba(128, 0, 128, 1);
+}
+
+.header-link-left{
+	/*float:right;*/
+	/*instead of float right, try this:*/
+	text-align: right;
+}
+
+.header-link-left:last-child{
+	margin-right: 0px;
+}
+
+.header-link-right{
+	/*float:left;*/
+	/*instead of float left, try this:*/
+	text-align: left;
+}
+
+.header-link-right:first-child{
+	margin-left: 0px;
+}
+
+#middle-section{
+	margin-top: 25px;
+}
+
+.main-content-section{
+	display: inline-block;
+	/*need vertical-align top or else sections will align by bottom
+	of content of the sections*/
+	vertical-align:top;
+}
+
+h1{
+	font-family: 'Georgia', Times, "Times New Roman", serif;
+	font-size: 20px;
+	font-weight: 600;
+	color: rgba(255,255,255,1);
+	text-align: center;
+}
+
+h2, h3{
+	font-family: "Helvetica", 'Helvetica Neue', Arial, sans-serif;
+	font-size: 17px;
+	color: rgba(255,255,255,1);
+	text-align: center;
+}
+
+#main-content-about-me{
+	/*need display block so will accept margin-left and margin-right auto*/
+	display:block;
+	width: 80%;
+	margin: 0px auto 25px;
+	margin-bottom: 25px;
+	background: rgba(0, 0, 0, 0.45);
+	/*why does more than 5px side padding make this section not cooperate?*/
+	padding: 20px;
+	border: 2px solid rgba(78, 42, 132,1);
+	border-radius:7px;
+}
+
+#photo-jonathon{
+	width: 125px;
+	margin: 20px 20px 0px 0px;
+	float: left;
+/*	display: inline helps the paragraph text wrap around the photo*/
+	display:inline;
+}
+
+p{
+	font-family: "Helvetica", 'Helvetica Neue', Arial, sans-serif;
+	font-size: 21px;
+	font-weight: 400;
+	color: rgba(245,245,245,1);
+}
+
+#jonathon-title{
+	text-align: left;
+	margin-bottom: 20px;
+}
+
+.main-content-about-me, p{
+	font-size:18px;
+	text-align: justify;
+/*	this increases the spaces between lines */
+	line-height: 120%;
+	margin: 20px 0px;
+}
+
+
+/* Dropdown Button */
+/* The container <div> - needed to position the dropdown content */
+.dropdown{
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    /*background-color: #f9f9f9;*/
+    background-color: rgba(230,230,230,0.2);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    border-radius: 15px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+	font-size:13px;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover{
+	background-color: lime;
+	color:purple;
+	border-radius: 10px;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: lime;
+}
+
+
+.dropdown:link, .dropdown:visited, .dropdown:active{
+	text-decoration: none;
+	color: rgba(230,230,230,1);
+	color:lime;
+}
+
+.dropdown:hover{
+	font-size: 17px;
+	background-color: rgba(230,230,230,0.3);
+	/*color:purple;*/
+	color: rgba(128, 0, 128, 1);
+}
+
+.wrapper{
+	min-height:100%;
+	/*used -33.91px for bottom margin because the footer height is 27.45px
+	and footer border is 3px*/
+	margin: 0 auto -30.45px;
+}
+
+/* required for the ryanfait sticky footer. Defining the
+push class height as anything greater than the footer height
+ensures the content above the footer is (this height - footer height)
+above the footer. However, if you want the content above the footer
+to end directly flush with with top of the footer, this height
+should equal the footer height. */
+.push{
+	height: 30.45px;
+}
+
+footer{
+	background: rgba(64,64,64,1);	
+	border-top: 3px solid #4E2A84;
+	text-align: center;
+	/*need clear:both for the footer if you want it to always be below
+	the bottommost middle section content. Without clear both, the footer
+	will go beneath the middle content.*/
+	clear:both;
+}
+
+#footer-content{
+	font-family: 'Georgia', Times, "Times New Roman", serif;
+	font-size: 10px;
+	color: #f2f2f2;
+	padding: 9px 0;
+}
+
+.footer-link:link, .footer-link:visited, .footer-link:active{
+	text-decoration: none;
+	color: #f2f2f2;
+}
+
+.footer-link:hover{
+	text-decoration: underline;
+	background-color: lime;
+	color: rgb(78, 42, 132);
+}
+
+
+	/*use overflow auto if you want a scrollbar only if the content
+	is clipped. use overflow scroll if you always want to see the
+	scrollbars, which are disabled if no content is clipped.*/
+/*	overflow:auto;*/	
+
+
+
+
+
+
+ul, li{
+	font-family: "Helvetica", 'Helvetica Neue', Arial, sans-serif;
+	font-size: 20px;
+	font-weight: 400;
+/*	color: #000000;*/
+	color: rgba(0,0,0,1);
+	text-align: center;
+}
+
+
+
+
+/*#sidebar{
+	position: absolute;
+	top: auto;
+	right:0;
+	bottom:auto;
+}
+
+#contact-me{
+	width: 100%;
+	text-align: center;
+	background-color:#ffffff;
+	padding:5px;
+	border:1px solid #cccccc;
+	border-radius:7px;
+}
+
+.logo-link{
+	width: 35px;
+	margin: 5px;
+}
+
+#logo-link-linkedinsmaller{
+	width: 40px;
+	margin: 5px;
+}
+
+.logo-link:last-child{
+	margin-right:0;
+}*/
