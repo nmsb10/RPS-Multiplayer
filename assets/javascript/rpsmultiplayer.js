@@ -140,6 +140,7 @@ $("#add-player").on("click", function(){
 //check the database if playerOne and/or playerTwo exist(s)
 fdb.ref('players').on('value', function(snapshot) {
 	var p1choice = snapshot.child('playerOne').child('choice').val();
+	var p2choice = snapshot.child('playerTwo').child('choice').val();
 	if(snapshot.child('playerOne').exists()){
 		//need to make needPlayerOne = false here, because it didn't work in the
 		needPlayerOne = false;
@@ -171,6 +172,11 @@ fdb.ref('players').on('value', function(snapshot) {
 	 		$("#game-content-secondplayer-p1").html(gameContentP2);
 	 		$('#player-status-p1').html("<div class='text'>Hello " + playerOneName + ". You are Player 1.</div>"+
 	 		"<div class='text' id='p1-status-update'>Your turn to choose!</div>");
+	 	}
+		gameContentP1 = "<div>" + playerOneName + "</div>"+ "<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div>";
+	 	if(p2choice===''){
+	 		$('game-content-firstplayer-p2').html(gameContentP1);
+	 		$('game-content-p2').html(gameContentP2);
 	 	}
 	 }
 	 if(snapshot.child('playerOne').exists() && snapshot.child('playerTwo').exists()){
@@ -206,8 +212,9 @@ fdb.ref('players').on('value', function(snapshot) {
 fdb.ref('turn').on('value', function(snapshot) {
 	var turnNumber = parseInt(snapshot.val());
 	if(turnNumber===1){
-		//prepare game-content-p1 etc
-
+		//clear any prior player choices
+		$('.chosen').remove();
+		$('#win-status').text('good luck!');
 		//give player one options
 		console.log("turn one now");
 		game.generatePlayerOneOptions();
@@ -242,10 +249,16 @@ var game =
 		}
 		var selectionDiv = $('<div class="selections" id = "selections-p1">');
 		selectionDiv.html(choices);
+		$('#p1-status-update').html("your turn to choose :)");
+		$('#p2-status-update').text("Waiting for " + playerOneName + " to choose.");
+		//update game-content-p1 and game-content-secondplayer-p1 with current scores (accomplished when players is value changed, above)
+		//gameContentP1 = "<div>" + playerOneName + "</div>"+ "<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div>";
+		$("#game-content-p1").html(gameContentP1);
 		$('#game-content-p1').append(selectionDiv);
 	},
 	generatePlayerTwoOptions: function(){
-		$('#p2-status-update').text("Your turn to choose!");
+		$('#p2-status-update').text("Your turn to choose.");
+		$('#p1-status-update').text("Waiting for " + playerTwoName + " to choose.");
 		var choices = '';
 		console.log("options are: " + game.options);
 		for(var i = 0; i<game.options.length; i++){
@@ -273,7 +286,6 @@ var game =
 				$('#selections-p1').replaceWith('<div class="chosen">Scissors</div>');
 			}
 			console.log("user one copmleteds selection");
-			$('#p1-status-update').text("Waiting for " + playerTwoName + " to choose.");
 			fdb.ref('turn').set('2');
 			turn=2;
 			fdb.ref('players').child('playerOne').child('choice').set(playerOneSelection);
@@ -363,11 +375,9 @@ var game =
 
 		game.setAnswerTimer();
 		game.timedAnswerReveal();
-		//reset playerOneSelection and playerTwo Selection to '',
-	//and reset p1AnswerSelected and p2AnswerSelected to false;
 	},
 	setAnswerTimer: function(){
-		game.answerTimer = 6;
+		game.answerTimer = 8;
 	},
 	timedAnswerReveal: function(){
 		counter = setInterval(game.answerReveal, 1000);
@@ -382,8 +392,10 @@ var game =
 		}else if(game.answerTimer === 0){
 			game.stop();
 			//update the turn when timer is 0
-			fdb.ref('turn').set('1');
-			turn = 1;
+			//reset playerOneSelection and playerTwo Selection to '',
+			fdb.ref('players').child('playerTwo').child('choice').set('');
+			fdb.ref('players').child('playerOne').child('choice').set('');//remember that setting playerOne's choice to '' will trigger: fdb.ref('turn').set('1');
+			//and reset p1AnswerSelected and p2AnswerSelected to false;
 		}
 	},
 	stop: function(){
@@ -450,6 +462,9 @@ function playerExistsCallback(player, exists) {
 // });
 
 //Create Firebase event for whenever chat child is added
+// fdb.ref('chat').on('value', function(snapshot){
+// });
+
 // fdb.ref('chat').on("child_added", function(childSnapshot, prevChildKey) {
 // 	console.log(childSnapshot.val());
 // 	var name = childSnapshot.val().name;
@@ -459,6 +474,4 @@ function playerExistsCallback(player, exists) {
 
 
 //https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
-
-
 //utilize Firebase.ServerValue.TIMESTAMP
