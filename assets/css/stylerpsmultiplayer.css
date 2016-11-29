@@ -90,7 +90,11 @@ button{
 }
 
 .selections{
-	line-height:165%;
+	line-height:175%;
+	font-family: helvetica, arial, sans-serif;
+	font-weight: 600;
+	color: purple;
+	cursor:pointer;
 }
 
 .chosen{
@@ -108,6 +112,13 @@ button{
 	text-align:center;
 	margin-left:auto;
 	margin-right:auto;
+}
+
+#resolved-game{
+	font-size:30px;
+	font-weight: 600;
+	color:lime;
+	padding-top:45px;
 }
 
 #communication-bar{

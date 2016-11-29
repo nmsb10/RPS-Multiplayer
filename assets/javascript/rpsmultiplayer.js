@@ -1,6 +1,3 @@
-//$(document).ready(function(){
-//});
-
 //intialize Firebase
 var config = {
     apiKey: "AIzaSyA6DjzJuXMwq6F1hN9RpFRRKbJNzdzcH58",
@@ -16,47 +13,176 @@ var fdb = firebase.database();
 
 var needPlayerOne = true;
 var needPlayerTwo = true;
+var playerOneChoice = '';
+var playerTwoChoice = '';
 var playerOneName = '';
 var playerTwoName = '';
 var playerOneLosses = 0;
 var playerOneWins = 0;
+var playerOneTies = 0;
+var playerTwoLosses = 0;
+var playerTwoTies = 0;
+var playerTwoWins = 0;
+
+var gameContentP1 = '';
+var gameContentP2 = '';
 //create turns
-var turns = 0;
+var turn = 0;
+
+// button for adding players
+$("#add-player").on("click", function(){
+	if($("#name-input").val()===""){
+		alert("you forgot to type your name.");
+		// IMPORTANT! We have this line so that users can hit "enter" instead
+		//of clicking on the button AND it won't move to the next page
+		return false;
+	}else if(needPlayerOne && needPlayerTwo){
+		//if need both players, set the first name entered to playerOne
+		//take user name
+		console.log("need player one?" + needPlayerOne);
+		var playerName = $("#name-input").val().trim();
+		playerOneName = playerName;
+		console.log("player one name = " + playerOneName);
+		//create object to go inside player array with name, wins, losses, choice
+		var newPlayer = {
+			name: playerName,
+			wins:  0,
+			losses: 0,
+			ties: 0,
+			choice: ""
+		};
+		//each element in players is a new object newPlayer
+		//players[0] = {"playerOne":newPlayer};
+		//players[1] = {"playerTwo":newPlayer};
+
+		//difference between .set and .push??
+		//use .push to upload new player information to firebase
+		//inside .ref, create the "child" of the database called 'players'
+		//.set overwrites data at the specified location
+	 	fdb.ref('players').child('playerOne').set(newPlayer);
+	 	needPlayerOne = false;
+		console.log("Need player one?" + needPlayerOne);
+		console.log("successful set of playerOne");
+	 	//$("#game-content-p1").attr('data-player', 'p1');
+	 	//update game-content-firstplayer div for player one only:
+	 	var gcp1 = "<div class='game-box' id='game-content-p1'><div>" + playerOneName + "</div>"+
+	 	"<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div></div>";
+	 	$("#game-content-firstplayer").replaceWith(gcp1);
+
+	 	//update game-content-secondplayer div for player one only:
+	 	var gcp2p1 = "<div class='game-box' id='game-content-secondplayer-p1'>Thank you. Now waiting for player 2.</div>";
+	 	$("#game-content-secondplayer").replaceWith(gcp2p1);
+		
+		//update player-status div
+		//create a new div just like the original, except with new id = player-status-p1
+		var p1 = "<div id='player-status-p1'><div class='text'> Hello " + playerOneName + ". You are Player 1.</div>"+
+		"<div class='text' id='p1-status-update'>Waiting for Player 2 to arrive.</div></div>";
+		$('#player-status').replaceWith(p1);
+
+		//update communication-bar for playerOne
+		//change type = "button" so user presses enter for messages and page will NOT refresh!
+		//HOWEVER, tried to include a button, but the act of replacing communication-bar with comBarP1 made the page refresh!!!
+	 	var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><input id = "add-message-p1" type = "submit" value = "Send"></form>';
+	 	$('#communication-bar').replaceWith(comBarP1);
+		//return false;
+	}else if(needPlayerTwo && !needPlayerOne){
+		playerTwoName = $("#name-input").val().trim();
+		//create object to go inside player array with name, wins, losses, choice
+		// var newPlayer = {
+		// 	name: playerName,
+		// 	wins:  0,
+		// 	losses:0,
+		// 	choice: ""
+		// };
+		fdb.ref('players').child('playerTwo').set({
+			name: $("#name-input").val().trim(),
+			wins: 0,
+			losses: 0,
+			ties: 0,
+			choice:""
+		});
+		console.log("player two name = " + playerTwoName);
+		//difference between .set and .push??
+		//use .push to upload new player information to firebase
+		//inside .ref, create the "child" of the database called 'players'
+		//.set overwrites data at the specified location
+	 	needPlayerTwo = false;
+		console.log("Need player two?" + needPlayerTwo);
+		console.log("successful set of playerTwo in firebase");
+	 	//update game-content-secondplayer div for player two only:
+	 	var gcp2 = "<div class='game-box' id='game-content-p2'><div>" + playerTwoName + "</div>"+
+	 	"<div>Wins: " + playerTwoWins+ " | Losses: "+  playerTwoLosses + "<br/>Ties: " + playerTwoTies + "</div></div>";
+	 	$("#game-content-secondplayer").replaceWith(gcp2);
+
+	 	//update game-content-firstplayer div for player two only:
+	 	var gcp1p2 = "<div class='game-box' id='game-content-firstplayer-p2'><div>" + playerOneName + "</div>"+
+	 	"<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div></div>";
+	 	$("#game-content-firstplayer").replaceWith(gcp1p2);
+		
+		//update player-status div
+		//create a new div just like the original, except with new id = player-status-p1
+		var p2 = "<div id='player-status-p2'><div class='text'>Hello " + playerTwoName + ". You are Player 2.</div>"+
+		"<div class='text' id='p2-status-update'>Waiting for " + playerOneName + " to choose.</div></div>";
+		$('#player-status').replaceWith(p2);
+
+		//update player one's game-content-secondplayer
+		$("#game-content-secondplayer-p1").html("<div>" + playerTwoName + "</div>"+
+	 	"<div>Wins: " + playerTwoWins+ " | Losses: "+  playerTwoLosses + "<br/>Ties: " + playerTwoTies + "</div>");
+
+	 	//update communication-bar for playerTwo
+	 	var comBarP2 = '<form id="communication-bar-p2"><input type="text" id="message-input-p2"><input id = "add-message-p2" type = "submit" value = "Send"></form>';
+	 	$('#communication-bar').replaceWith(comBarP2);
+	}
+	//WHY DO I INCLUDE RETURN FALSE HERE?
+	return false;
+});
 
 //check the database if playerOne and/or playerTwo exist(s)
 fdb.ref('players').on('value', function(snapshot) {
+	var p1choice = snapshot.child('playerOne').child('choice').val();
 	if(snapshot.child('playerOne').exists()){
 		//need to make needPlayerOne = false here, because it didn't work in the
 		needPlayerOne = false;
+		playerOneChoice = snapshot.child('playerOne').val().choice;
 		playerOneName = snapshot.child('playerOne').val().name;
 		playerOneLosses = snapshot.child('playerOne').val().losses;
+		playerOneTies = snapshot.child('playerOne').val().ties;
 		playerOneWins = snapshot.child('playerOne').val().wins;
 		//update html for game-content-p1 for all other browsers:
-		$("#game-content-firstplayer").html("<div>" + playerOneName + "</div>"+
-	 	"<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "</div>");
+		gameContentP1 = "<div>" + playerOneName + "</div>"+ "<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div>";
+		$("#game-content-firstplayer").html(gameContentP1);
 	 	//update html for game-content-secondplayer for all other browsers:
 	 	$("#game-content-secondplayer").html("you are player two!");
 	}
 	if(snapshot.child('playerTwo').exists()){
 		needPlayerTwo = false;
+		playerTwoChoice = snapshot.child('playerTwo').val().choice;
 		playerTwoName = snapshot.child('playerTwo').val().name;
 		playerTwoLosses = snapshot.child('playerTwo').val().losses;
+		playerTwoTies = snapshot.child('playerTwo').val().ties;
 		playerTwoWins = snapshot.child('playerTwo').val().wins;
 		//update html for game-content-p2 for all other browsers:
-		var gameContentP2 = "<div>" + playerTwoName + "</div>"+
-			"<div>Wins: " + playerTwoWins+ " | Losses: "+  playerTwoLosses + "</div>";
+		gameContentP2 = "<div>" + playerTwoName + "</div>"+
+			"<div>Wins: " + playerTwoWins+ " | Losses: "+  playerTwoLosses + "<br/>Ties: " + playerTwoTies + "</div>";
 		$("#game-content-secondplayer").html(gameContentP2);
-	 	//update html for game-content-secondplayer-p1 for player1's browser:
-	 	$("#game-content-secondplayer-p1").html(gameContentP2);
-	 	//update
-	 	$('#player-status-p1').html("<div class='text'>Hello " + playerOneName + ". You are Player 1.</div>"+
-		"<div class='text' id='p1-status-update'>Your turn to choose!</div>");
+	 	//update player1 divs only if they have not selected a choice:
+	 	if(p1choice===''){
+	 		//update html for game-content-secondplayer-p1 for player1's browser:
+	 		$("#game-content-secondplayer-p1").html(gameContentP2);
+	 		$('#player-status-p1').html("<div class='text'>Hello " + playerOneName + ". You are Player 1.</div>"+
+	 		"<div class='text' id='p1-status-update'>Your turn to choose!</div>");
+	 	}
 	 }
 	 if(snapshot.child('playerOne').exists() && snapshot.child('playerTwo').exists()){
 		console.log("have two players");
-		fdb.ref('turn').set('1');
 		needPlayerOne = false;
 		needPlayerTwo = false;
+		//if playerone already  has a choice, don't reset turn to 1!
+		//need this so when you update playerOne's choice, we don't reset turn to 1
+		if(p1choice===""){
+			fdb.ref('turn').set('1');
+			turn=1;
+		}
 		//update player-status div so user may not enter another name
 		$('#player-status').html("<div class='text' style='line-height:120%;'> Hello. Players " + playerOneName + " and " + playerTwoName +
 			" are playing. Please feel free to observe.<br/>If you see no activity for an extended period of time, "+
@@ -66,6 +192,8 @@ fdb.ref('players').on('value', function(snapshot) {
 	}
 
 	//remove a player if they disconnect
+//if a player disconnects:
+//https://firebase.google.com/docs/database/web/offline-capabilities
 	fdb.ref('players').child('playerOne').onDisconnect().remove();
  	fdb.ref('players').child('playerTwo').onDisconnect().remove();
 // //console log any errors
@@ -78,6 +206,8 @@ fdb.ref('players').on('value', function(snapshot) {
 fdb.ref('turn').on('value', function(snapshot) {
 	var turnNumber = parseInt(snapshot.val());
 	if(turnNumber===1){
+		//prepare game-content-p1 etc
+
 		//give player one options
 		console.log("turn one now");
 		game.generatePlayerOneOptions();
@@ -90,12 +220,19 @@ fdb.ref('turn').on('value', function(snapshot) {
 		game.checkResponseP2();
 	}
 	if(turnNumber===3){
-		game.resoleChoices();
+		game.resolveChoices();
 	}
 });
 
 var game =
 {
+	twoPlayers:function(){
+		if(!needPlayerOne && !needPlayerTwo){
+			return true;
+		}else{
+			return false;
+		}
+	},
 	options:['rock', 'paper', 'scissors'],
 	generatePlayerOneOptions: function(){
 		var choices = '';
@@ -106,7 +243,6 @@ var game =
 		var selectionDiv = $('<div class="selections" id = "selections-p1">');
 		selectionDiv.html(choices);
 		$('#game-content-p1').append(selectionDiv);
-		//game.checkResponseP1();
 	},
 	generatePlayerTwoOptions: function(){
 		$('#p2-status-update').text("Your turn to choose!");
@@ -139,6 +275,7 @@ var game =
 			console.log("user one copmleteds selection");
 			$('#p1-status-update').text("Waiting for " + playerTwoName + " to choose.");
 			fdb.ref('turn').set('2');
+			turn=2;
 			fdb.ref('players').child('playerOne').child('choice').set(playerOneSelection);
 		});
 	},
@@ -148,45 +285,109 @@ var game =
 				var replacement = $('<div class="chosen">');
 				replacement.text("Rock");
 				$('#selections-p2').replaceWith(replacement);
-				playerOneSelection = "rock";
-				$('#p2-status-update').text("Waiting for " + playerTwoName + " to choose.");
-				//fdb.ref('players').child('playerOne').child('choice').set("rock");				
-			} else if ($(this).attr("id") === 'p1-paper'){
-				playerOneSelection = "paper";
-				//fdb.ref('players').child('playerOne').child('choice').set("paper");
-				$('#selections-p1').replaceWith('<div class="chosen">Paper</div>');
-				$('#p1-status-update').text("Waiting for " + playerTwoName + " to choose.");
-			} else if ($(this).attr("id") === 'p1-scissors'){
-				playerOneSelection = "scissors";
-				//fdb.ref('players').child('playerOne').child('choice').set("scissors");
-				$('#selections-p1').replaceWith('<div class="chosen">Scissors</div>');
-				$('#p1-status-update').text("Waiting for " + playerTwoName + " to choose.");
+				playerTwoSelection = "rock";
+			} else if ($(this).attr("id") === 'p2-paper'){
+				playerTwoSelection = "paper";
+				$('#selections-p2').replaceWith('<div class="chosen">Paper</div>');
+			} else if ($(this).attr("id") === 'p2-scissors'){
+				playerTwoSelection = "scissors";
+				$('#selections-p2').replaceWith('<div class="chosen">Scissors</div>');
 			}
+			//remember: MUST set playerTwo's choice BEFORE changing turn to 3. Otherwise,
+			//the turn 3 code will run BEFORE playerTwo's choice has been added.
+			fdb.ref('players').child('playerTwo').child('choice').set(playerTwoSelection);
 			fdb.ref('turn').set('3');
+			turn = 3;
 		});
 	},
+	answerTimer:0,
 	resolveChoices:function(){
-		if(game.playerOneSelection==="rock" && game.playerTwoSelection==="rock"){
-			//tie
-		} else if (game.playerOneSelection==="rock" && game.playerTwoSelection==="paper"){
-
-		} else if (game.playerOneSelection==="rock" && game.playerTwoSelection==="scissors"){
-
-		} else if (game.playerOneSelection==="paper" && game.playerTwoSelection==="rock"){
-
-		} else if (game.playerOneSelection==="paper" && game.playerTwoSelection==="rock"){
-
-		} else if (game.playerOneSelection==="paper" && game.playerTwoSelection==="rock"){
-
-		} else if (game.playerOneSelection==='scissors' && game.playerTwoSelection==="rock"){
-
-		} else if (game.playerOneSelection==='scissors' && game.playerTwoSelection==="rock"){
-
-		} else if (game.playerOneSelection==='scissors' && game.playerTwoSelection==="rock"){
-
+		//create a timer, update game status messages for both players with countdown,
+		//set turn to 1 at end
+		//make sure player divs are properly cleared / set as appropriate
+		console.log("time to resolve choices");
+		//update both players divs to reveal choices. Also update any 3rd party viewers.
+		$('#game-content-secondplayer-p1').html(gameContentP2 + '<div class="chosen">' + playerTwoChoice + '</div>');
+		$('#game-content-firstplayer-p2').html(gameContentP1 + '<div class="chosen">' + playerOneChoice + '</div>');
+		$('#game-content-firstplayer').html(gameContentP1 + '<div class="chosen">' + playerOneChoice + '</div>');
+		$('#game-content-secondplayer').html(gameContentP2 + '<div class="chosen">' + playerTwoChoice + '</div>');
+		var currentTies = parseInt(playerOneTies);
+		var p1wins = parseInt(playerOneWins);
+		var p1losses = parseInt(playerOneLosses);
+		var p2wins = playerTwoWins;
+		var p2losses = playerTwoLosses;
+		console.log("player one choice: " + playerOneChoice);
+		console.log("player two choice: " + playerTwoChoice);
+		if(playerOneChoice==="rock" && playerTwoChoice==="rock"){
+			//REMEMBER: must update scores FIRST, then update html.
+			$('#win-status').html('<div id="resolved-game">You<br/>tie</div>');
+			currentTies++;
+		} else if (playerOneChoice==="rock" && playerTwoChoice==="paper"){
+			p1losses++;
+			p2wins++;
+			$('#win-status').html('<div id="resolved-game">'+ playerTwoName + '<br/>wins</div>');
+		} else if (playerOneChoice==="rock" && playerTwoChoice==="scissors"){
+			p1wins++;
+			p2losses++;
+			$('#win-status').html('<div id="resolved-game">'+ playerOneName + '<br/>wins</div>');			
+		} else if (playerOneChoice==="paper" && playerTwoChoice==="rock"){
+			p1wins++;
+			p2losses++;
+			$('#win-status').html('<div id="resolved-game">'+ playerOneName + '<br/>wins</div>');
+		} else if (playerOneChoice==="paper" && playerTwoChoice==="paper"){
+			currentTies++;
+			$('#win-status').html('<div id="resolved-game">You<br/>tie</div>');
+		} else if (playerOneChoice==="paper" && playerTwoChoice==="scissors"){
+			p1losses++;
+			p2wins++;
+			$('#win-status').html('<div id="resolved-game">'+ playerTwoName + '<br/>wins</div>');
+		} else if (playerOneChoice==='scissors' && playerTwoChoice==="rock"){
+			p1losses++;
+			p2wins++;
+			$('#win-status').html('<div id="resolved-game">'+ playerTwoName + '<br/>wins</div>');
+		} else if (playerOneChoice==='scissors' && playerTwoChoice==="paper"){
+			p1wins++;
+			p2losses++;
+			$('#win-status').html('<div id="resolved-game">'+ playerOneName + '<br/>wins</div>');
+		} else if (playerOneChoice==='scissors' && playerTwoChoice==="scissors"){
+			currentTies++;
+			$('#win-status').html('<div id="resolved-game">You<br/>tie</div>');
 		}
-		//don't forget to reset playerOneSelection and playerTwo Selection to '',
+		//update scores
+		fdb.ref('players').child('playerOne').child('ties').set(currentTies);
+		fdb.ref('players').child('playerTwo').child('ties').set(currentTies);
+		fdb.ref('players').child('playerOne').child('wins').set(p1wins);
+		fdb.ref('players').child('playerTwo').child('wins').set(p2wins);
+		fdb.ref('players').child('playerOne').child('losses').set(p1losses);
+		fdb.ref('players').child('playerTwo').child('losses').set(p2losses);
+
+		game.setAnswerTimer();
+		game.timedAnswerReveal();
+		//reset playerOneSelection and playerTwo Selection to '',
 	//and reset p1AnswerSelected and p2AnswerSelected to false;
+	},
+	setAnswerTimer: function(){
+		game.answerTimer = 6;
+	},
+	timedAnswerReveal: function(){
+		counter = setInterval(game.answerReveal, 1000);
+	},
+	answerReveal: function(){
+		game.answerTimer --;
+		$('#p1-status-update').html("next opportunity to play in: "+ game.answerTimer + " seconds.");
+		$('#p2-status-update').html("next opportunity to play in: "+ game.answerTimer + " seconds.");
+		if(game.answerTimer === 1){
+			$('#p1-status-update').html("next opportunity to play in: "+ game.answerTimer + " second!");
+			$('#p2-status-update').html("next opportunity to play in: "+ game.answerTimer + " second!");
+		}else if(game.answerTimer === 0){
+			game.stop();
+			//update the turn when timer is 0
+			fdb.ref('turn').set('1');
+			turn = 1;
+		}
+	},
+	stop: function(){
+		clearInterval(counter);
 	}
 };
 
@@ -210,106 +411,6 @@ function playerExistsCallback(player, exists) {
 		return false;
 	}
 }
-
-// button for adding players
-$("#add-player").on("click", function(){
-	if($("#name-input").val()===""){
-		alert("you forgot to type your name.");
-		// IMPORTANT! We have this line so that users can hit "enter" instead
-		//of clicking on the button AND it won't move to the next page
-		return false;
-	}else if(needPlayerOne && needPlayerTwo){
-		//take user name
-		console.log("need player one?" + needPlayerOne);
-		var playerName = $("#name-input").val().trim();
-		playerOneName = playerName;
-		console.log("player one name = " + playerOneName);
-		//create object to go inside player array with name, wins, losses, choice
-		var newPlayer = {
-			name: playerName,
-			wins:  0,
-			losses: 0,
-			choice: ""
-		};
-		//each element in players is a new object newPlayer
-		//players[0] = {"playerOne":newPlayer};
-		//players[1] = {"playerTwo":newPlayer};
-
-		//difference between .set and .push??
-		//use .push to upload new player information to firebase
-		//inside .ref, create the "child" of the database called 'players'
-		//.set overwrites data at the specified location
-	 	fdb.ref('players').child('playerOne').set(newPlayer);
-	 	needPlayerOne = false;
-		console.log("Need player one?" + needPlayerOne);
-		console.log("successful set of playerOne");
-	 	//$("#game-content-p1").attr('data-player', 'p1');
-	 	//update game-content-firstplayer div for player one only:
-	 	var gcp1 = "<div class='game-box' id='game-content-p1'><div>" + playerOneName + "</div>"+
-	 	"<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "</div></div>";
-	 	$("#game-content-firstplayer").replaceWith(gcp1);
-
-	 	//update game-content-secondplayer div for player one only:
-	 	var gcp2p1 = "<div class='game-box' id='game-content-secondplayer-p1'>Thank you. Now waiting for player 2.</div>";
-	 	$("#game-content-secondplayer").replaceWith(gcp2p1);
-		
-		//update player-status div
-		//create a new div just like the original, except with new id = player-status-p1
-		var p1 = "<div id='player-status-p1'><div class='text'> Hello " + playerOneName + ". You are Player 1.</div>"+
-		"<div class='text' id='p1-status-update'>Waiting for Player 2 to arrive.</div></div>";
-		$('#player-status').replaceWith(p1);
-
-		//update communication-bar for playerOne
-		//change type = "button" so user presses enter for messages and page will NOT refresh!
-		//HOWEVER, tried to include a button, but the act of replacing communication-bar with comBarP1 made the page refresh!!!
-	 	var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><input id = "add-message-p1" type = "submit" value = "Send"></form>';
-	 	$('#communication-bar').replaceWith(comBarP1);
-		//return false;
-	}else if(needPlayerTwo && !needPlayerOne){
-		playerTwoName = $("#name-input").val().trim();
-		//create object to go inside player array with name, wins, losses, choice
-		// var newPlayer = {
-		// 	name: playerName,
-		// 	wins:  0,
-		// 	losses:0,
-		// 	choice: ""
-		// };
-		fdb.ref('players').child('playerTwo').set({
-			name: $("#name-input").val().trim(),
-			wins: 0,
-			losses: 0,
-			choice:""
-		});
-		console.log("player two name = " + playerTwoName);
-		//difference between .set and .push??
-		//use .push to upload new player information to firebase
-		//inside .ref, create the "child" of the database called 'players'
-		//.set overwrites data at the specified location
-	 	needPlayerTwo = false;
-		console.log("Need player two?" + needPlayerTwo);
-		console.log("successful set of playerTwo in firebase");
-	 	//update game-content-secondplayer div for player two only:
-	 	var gcp2 = "<div class='game-box' id='game-content-p2'><div>" + playerTwoName + "</div>"+
-	 	"<div>Wins: " + playerTwoWins+ " | Losses: "+  playerTwoLosses + "</div></div>";
-	 	$("#game-content-secondplayer").replaceWith(gcp2);
-		
-		//update player-status div
-		//create a new div just like the original, except with new id = player-status-p1
-		var p2 = "<div id='player-status-p2'><div class='text'>Hello " + playerTwoName + ". You are Player 2.</div>"+
-		"<div class='text' id='p2-status-update'>Waiting for " + playerOneName + " to choose.</div></div>";
-		$('#player-status').replaceWith(p2);
-
-		//update player one's game-content-secondplayer
-		$("#game-content-secondplayer-p1").html("<div>" + playerTwoName + "</div>"+
-	 	"<div>Wins: " + playerTwoWins+ " | Losses: "+  playerTwoLosses + "</div>");
-
-	 	//update communication-bar for playerTwo
-	 	var comBarP2 = '<form id="communication-bar-p2"><input type="text" id="message-input-p2"><input id = "add-message-p2" type = "submit" value = "Send"></form>';
-	 	$('#communication-bar').replaceWith(comBarP2);
-	}
-	//WHY DO I INCLUDE RETURN FALSE HERE?
-	return false;
-});
 
 //message box code:
 //https://firebase.google.com/docs/database/web/structure-data
@@ -360,22 +461,4 @@ $("#add-player").on("click", function(){
 //https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
 
 
-//function to join players to game
 //utilize Firebase.ServerValue.TIMESTAMP
-//if statement to decide who winner is based on results
-
-//firebase also keeps track of turns
-
-//three divs, first div contains:
-//"player 1 name"
-//Rock
-//paper
-//scissors
-//wins: 0 losses: 0 ties: 0
-
-//Once player 1 selects choice, this becomes primary content of player 1 div
-
-//then player 2 screen says "it's your turn"
-
-//if a player disconnects:
-//https://firebase.google.com/docs/database/web/offline-capabilities
