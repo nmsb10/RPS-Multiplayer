@@ -69,7 +69,7 @@ $("#add-player").on("click", function(){
 		//update communication-bar for player one only
 		//change type = "button" so user presses enter for messages and page will NOT refresh!
 		//HOWEVER, tried to include a button, but the act of replacing communication-bar with comBarP1 made the page refresh!!!
-	 	var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><input id = "add-message-p1" type = "submit" value = "Send"></form>';
+	 	var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><button id = "add-message-p1">Send</button></form>';
 	 	$('.communication-bar').replaceWith(comBarP1);
 		//return false;
 	}else if(needPlayerTwo && !needPlayerOne){
@@ -115,26 +115,6 @@ $("#add-player").on("click", function(){
 			ties: 0,
 			choice:""
 		});
-	 	//update player-status div for player one only (remove name-input field)
-		//create a new div just like the original, except with new id = player-status-p1
-		// var p1 = "<div id='player-status-p1'><div id='player-welcome-p1'> Hello " + playerOneName + ". You are Player 1.</div>"+
-		// "<div id='status-update-p1'>Waiting for Player 2 to arrive.</div></div>";
-		// $('#player-status').replaceWith(p1);
-
-		// //update game-content-firstplayer div for player one only:
-	 // 	var gcp1 = "<div class='game-box' id='game-content-p1'><div>" + playerOneName + "</div>"+
-	 // 	"<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div></div>";
-	 // 	$("#game-content-firstplayer").replaceWith(gcp1);
-
-	 // 	//update game-content-secondplayer div for player one only:
-	 // 	var gcp2p1 = "<div class='game-box' id='game-content-secondplayer-p1'>Thank you. Now waiting for player 2.</div>";
-	 // 	$("#game-content-secondplayer").replaceWith(gcp2p1);
-
-		// //update communication-bar for player one only
-		// //change type = "button" so user presses enter for messages and page will NOT refresh!
-		// //HOWEVER, tried to include a button, but the act of replacing communication-bar with comBarP1 made the page refresh!!!
-	 // 	var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><input id = "add-message-p1" type = "submit" value = "Send"></form>';
-	 // 	$('.communication-bar').replaceWith(comBarP1);
 	}
 	// IMPORTANT! We have this line so that users can hit "enter" instead
 		//of clicking on the button AND it won't move to the next page??
@@ -166,18 +146,9 @@ fdb.ref('players').on('value', function(snapshot) {
 	 	//display player one's choice if they have one
 	 	var selection1 = $('<div class="chosen">');
 		selection1.text(playerOneChoice);
-		//var selectionT = $('<div class="chosen">');
-		//selectionT.text(playerTwoChoice);
 	 	if(p1choice!==''){
 	 		$("#game-content-p1").append(selection1);
 	 	}
-	 	//display both players choices when applicable
-	 	// if(p1choice!=='' && p2choice!==''){
-	 	// 	$("#game-content-p1").append(selection1);
-	 	// 	$('#game-content-secondplayer-p1').append(selectionT);
-	 	// 	$('#game-content-firstplayer').append(selection1);
-	 	// 	$('#game-content-secondplayer').append(selectionT);
-	 	// }
 	}
 	if(snapshot.child('playerTwo').exists()){
 		needPlayerTwo = false;
@@ -458,50 +429,50 @@ var game =
 //message box code:
 //https://firebase.google.com/docs/database/web/structure-data
 //repeat for add-message-p2
-// $('#add-message-p1').on("click", function(){
-// 	if($('#add-input-p1').val()===""){
-// 		alert("you forgot to type something.");
-// 		return false;
-// 	}else{
-// 		var message = $("#message-input-p1").val().trim();
-// 		var totalMessage = {
-// 			name: playerOneName,
-// 			message: message
-// 		};
-// 		fdb.ref('chat').push(totalMessage);
-// 		$('#message-input-p1').val('');
-// 		return false;
-// 	}
-// 	return false;
-// });
+$('#add-message-p1').on("click", function(){
+	if($('#add-input-p1').val()===""){
+		alert("you forgot to type something.");
+		return false;
+	}else{
+		var message = $("#message-input-p1").val().trim();
+		var totalMessage = {
+			name: playerOneName,
+			message: message
+		};
+		fdb.ref('chat').push(totalMessage);
+		$('#message-input-p1').val('');
+		return false;
+	}
+	return false;
+});
 
-// $('#add-message-p2').on("click", function(){
-// 	if($('#add-input-p2').val()===""){
-// 		alert("you forgot to type something.");
-// 		return false;
-// 	}else{
-// 		var message = $("#message-input-p2").val().trim();
-// 		var totalMessage = {
-// 			name: playerTwoName,
-// 			message: message
-// 		};
-// 		fdb.ref('chat').push(totalMessage);
-// 		$('#message-input-p2').val('');
-// 		return false;
-// 	}
-// 	return false;
-// });
+$('#add-message-p2').on("click", function(){
+	if($('#add-input-p2').val()===""){
+		alert("you forgot to type something.");
+		return false;
+	}else{
+		var message = $("#message-input-p2").val().trim();
+		var totalMessage = {
+			name: playerTwoName,
+			message: message
+		};
+		fdb.ref('chat').push(totalMessage);
+		$('#message-input-p2').val('');
+		return false;
+	}
+	return false;
+});
 
 //Create Firebase event for whenever chat child is added
 // fdb.ref('chat').on('value', function(snapshot){
 // });
 
-// fdb.ref('chat').on("child_added", function(childSnapshot, prevChildKey) {
-// 	console.log(childSnapshot.val());
-// 	var name = childSnapshot.val().name;
-// 	var message = childSnapshot.val().message;
-// 	$('#message-display-start').append('<div class="text-message">'+ name + ': ' + message + '</div>');
-// });
+fdb.ref('chat').on("child_added", function(childSnapshot, prevChildKey) {
+	console.log(childSnapshot.val());
+	var name = childSnapshot.val().name;
+	var message = childSnapshot.val().message;
+	$('#message-display-start').append('<div class="text-message">'+ name + ': ' + message + '</div>');
+});
 
 
 //https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
