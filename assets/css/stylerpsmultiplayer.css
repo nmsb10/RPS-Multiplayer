@@ -87,8 +87,16 @@ button{
 	font-size:15px;
 	text-align: left;
 	line-height: 120%;
+	margin-bottom: 3px;
 }
-
+.yy{
+	border-radius: 5px;
+	background: blue;
+	color:white;
+	cursor: pointer;
+	width: 100px;
+	text-align: center;
+}
 .selections{
 	line-height:175%;
 	font-family: helvetica, arial, sans-serif;
@@ -147,7 +155,7 @@ button{
 	margin-right:auto;
 }
 
-#message-input{
+.message-input{
 	width: 85%;
 }
 

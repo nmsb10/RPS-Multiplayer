@@ -69,8 +69,9 @@ $("#add-player").on("click", function(){
 		//update communication-bar for player one only
 		//change type = "button" so user presses enter for messages and page will NOT refresh!
 		//HOWEVER, tried to include a button, but the act of replacing communication-bar with comBarP1 made the page refresh!!!
-	 	var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><button id = "add-message-p1">Send</button></form>';
-	 	$('.communication-bar').replaceWith(comBarP1);
+	 	//var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><button id="add-message-p1">Send</button></form>';
+	 	//$('.communication-bar').replaceWith(comBarP1);
+	 	$(".message-input").attr('data-player',playerName);
 		//return false;
 	}else if(needPlayerTwo && !needPlayerOne){
 		playerTwoName = $("#name-input").val().trim();
@@ -100,8 +101,9 @@ $("#add-player").on("click", function(){
 	 	$("#game-content-secondplayer").replaceWith(gcp2);
 
 		//update communication-bar for playerTwo
-	 	var comBarP2 = '<form id="communication-bar-p2"><input type="text" id="message-input-p2"><input id = "add-message-p2" type = "submit" value = "Send"></form>';
-	 	$('.communication-bar').replaceWith(comBarP2);
+	 	// var comBarP2 = '<form id="communication-bar-p2"><input type="text" id="message-input-p2"><input id = "add-message-p2" type = "submit" value = "Send"></form>';
+	 	// $('.communication-bar').replaceWith(comBarP2);
+	 	$(".message-input").attr('data-player',playerTwoName);
 
 	 	//return false;
 	}else if(needPlayerOne && !needPlayerTwo){
@@ -200,6 +202,7 @@ fdb.ref('players').on('value', function(snapshot) {
 
 	 	//update html for game-content-firstplayer for all other browsers:
 	 	$("#game-content-firstplayer-p1").html("you are player one!");
+	 	$("#game-content-firstplayer-p2").html("waiting for player one.");
 	 	$("#game-content-firstplayer").html("you are player one!");
 
 	 	//update communication bar
@@ -215,7 +218,7 @@ fdb.ref('players').on('value', function(snapshot) {
 			" are playing. Please feel free to observe.<br/>If you see no activity for an extended period of time, "+
 			"please contact owner to remove players so others may play.<br/>Thank you.</div>");
 		//empty communication-bar so 3rd+ users may not contribute to messaging
-		$('.communication-bar').empty();
+		//$('.communication-bar').empty();
 
 		//if playerone already  has a choice, don't reset turn to 1!
 		//need this so when you update playerOne's choice, we don't reset turn to 1
@@ -226,6 +229,7 @@ fdb.ref('players').on('value', function(snapshot) {
 	 }
 	 if(!hasPlayerTwo && !hasPlayerOne){
 	 	fdb.ref('turn').remove();
+	 	fdb.ref('chat').remove();
 	 }
 
 	//remove a player if they disconnect
@@ -428,44 +432,19 @@ var game =
 
 //message box code:
 //https://firebase.google.com/docs/database/web/structure-data
-//repeat for add-message-p2
-$('#add-message-p1').on("click", function(){
-	if($('#add-input-p1').val()===""){
-		alert("you forgot to type something.");
-		return false;
-	}else{
-		var message = $("#message-input-p1").val().trim();
-		var totalMessage = {
-			name: playerOneName,
-			message: message
-		};
-		fdb.ref('chat').push(totalMessage);
-		$('#message-input-p1').val('');
-		return false;
-	}
+// button for adding messages
+$("#add-message").on("click", function(){
+	var idOfPlayer = $(".message-input").attr("data-player");
+	var message = $(".message-input").val().trim();
+	//when pushing data to this, values for the keys of the object CANNOT refer to items within the firebase!! or this will refresh the page!
+	fdb.ref('chat').push({
+		name: idOfPlayer,
+		message: message,
+		//timeSent: fdb.ServerValue.TIMESTAMP()
+	});
+	$(".message-input").val('');
 	return false;
 });
-
-$('#add-message-p2').on("click", function(){
-	if($('#add-input-p2').val()===""){
-		alert("you forgot to type something.");
-		return false;
-	}else{
-		var message = $("#message-input-p2").val().trim();
-		var totalMessage = {
-			name: playerTwoName,
-			message: message
-		};
-		fdb.ref('chat').push(totalMessage);
-		$('#message-input-p2').val('');
-		return false;
-	}
-	return false;
-});
-
-//Create Firebase event for whenever chat child is added
-// fdb.ref('chat').on('value', function(snapshot){
-// });
 
 fdb.ref('chat').on("child_added", function(childSnapshot, prevChildKey) {
 	console.log(childSnapshot.val());
@@ -474,6 +453,8 @@ fdb.ref('chat').on("child_added", function(childSnapshot, prevChildKey) {
 	$('#message-display-start').append('<div class="text-message">'+ name + ': ' + message + '</div>');
 });
 
+//answer for keeping the chat thing scrolled to bottom unless user scrolls otherwise
+//http://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
 
 //https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
 //utilize Firebase.ServerValue.TIMESTAMP
