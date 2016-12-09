@@ -107,6 +107,7 @@ $("#add-player").on("click", function(){
 
 	 	//return false;
 	}else if(needPlayerOne && !needPlayerTwo){
+		console.log('needPlayerOne AND do not needPlayerTwo!!! line 110');
 		//if need only playerOne, set the first name entered to playerOne
 		var nextName = $("#name-input").val().trim();
 		//create object to go inside player array with name, wins, losses, ties, choice
@@ -117,6 +118,29 @@ $("#add-player").on("click", function(){
 			ties: 0,
 			choice:""
 		});
+		//all the following code is the same as if we were starting from the beginning with no players
+
+	 	//update player-status div for player one only (remove name-input field)
+		//create a new div just like the original, except with new id = player-status-p1
+		var p1material = "<div class='text' id='player-status-p1'><div id='player-welcome-p1'> Hello " + playerOneName + ". You are Player 1.</div>"+
+		"<div id='status-update-p1'>Waiting for Player 2 to arrive.</div></div>";
+		$('#player-status').replaceWith(p1material);
+
+		//update game-content-firstplayer div for player one only:
+	 	var gcp1material = "<div class='game-box' id='game-content-p1'><div>" + playerOneName + "</div>"+
+	 	"<div>Wins: " + playerOneWins+ " | Losses: "+  playerOneLosses + "<br/>Ties: " + playerOneTies + "</div></div>";
+	 	$("#game-content-firstplayer").replaceWith(gcp1material);
+
+	 	//update game-content-secondplayer div for player one only:
+	 	var gcp2p1material = "<div class='game-box' id='game-content-secondplayer-p1'>Thank you. Now waiting for player 2.</div>";
+	 	$("#game-content-secondplayer").replaceWith(gcp2p1material);
+
+		//update communication-bar for player one only
+		//change type = "button" so user presses enter for messages and page will NOT refresh!
+		//HOWEVER, tried to include a button, but the act of replacing communication-bar with comBarP1 made the page refresh!!!
+	 	//var comBarP1 = '<form id="communication-bar-p1"><input type="text" id="message-input-p1"><button id="add-message-p1">Send</button></form>';
+	 	//$('.communication-bar').replaceWith(comBarP1);
+	 	$(".message-input").attr('data-player',nextName);
 	}
 	// IMPORTANT! We have this line so that users can hit "enter" instead
 		//of clicking on the button AND it won't move to the next page??
@@ -182,34 +206,6 @@ fdb.ref('players').on('value', function(snapshot) {
 	 		$('#game-content-secondplayer').append(selection2);
 	 	}
 	 }
-	 //in the event playerOne disconnects
-	 if(hasPlayerTwo && !hasPlayerOne){
-		needPlayerTwo = false;
-		needPlayerOne = true;
-		//define playerTwo variables from the database
-		playerTwoChoice = snapshot.child('playerTwo').val().choice;
-		playerTwoName = snapshot.child('playerTwo').val().name;
-		playerTwoLosses = snapshot.child('playerTwo').val().losses;
-		playerTwoTies = snapshot.child('playerTwo').val().ties;
-		playerTwoWins = snapshot.child('playerTwo').val().wins;
-
-		//update player-status div for player one only (add name-input field)
-		//create a new div just like the original
-		var defaultPlayerStatus = "<div id='player-status'><form><input type = 'text' id='name-input' placeholder='what is your name?'"+
-		"<input id = 'add-player' type = 'submit' value = 'Start'></form></div>";
-		$('#player-status-p1').replaceWith(defaultPlayerStatus);
-		$('#player-status').replaceWith(defaultPlayerStatus);
-
-	 	//update html for game-content-firstplayer for all other browsers:
-	 	$("#game-content-firstplayer-p1").html("you are player one!");
-	 	$("#game-content-firstplayer-p2").html("waiting for player one.");
-	 	$("#game-content-firstplayer").html("you are player one!");
-
-	 	//update communication bar
-	 	var commbar = "<form class='communication-bar'><input type='text' id='message-input'>"+
-	 	"<input id = 'add-message' type = 'submit' value = 'Send'></form>";
-	 	$('.communication-bar').replaceWith(commbar);
-	}
 	if(snapshot.child('playerOne').exists() && snapshot.child('playerTwo').exists()){
 		needPlayerOne = false;
 		needPlayerTwo = false;
@@ -227,16 +223,92 @@ fdb.ref('players').on('value', function(snapshot) {
 			turn=1;
 		}
 	 }
+	 //in the event playerOne disconnects
+	 if(hasPlayerTwo && !hasPlayerOne){
+		needPlayerTwo = false;
+		needPlayerOne = true;
+		//define playerTwo variables from the database
+		playerTwoChoice = snapshot.child('playerTwo').val().choice;
+		playerTwoName = snapshot.child('playerTwo').val().name;
+		playerTwoLosses = snapshot.child('playerTwo').val().losses;
+		playerTwoTies = snapshot.child('playerTwo').val().ties;
+		playerTwoWins = snapshot.child('playerTwo').val().wins;
+
+		//replace the player-status div with name entry
+		//update player-status div for player one only (add name-input field)
+		//create a new div just like the original
+		var defaultPlayerStatus = "<div id='player-status'><form><input type = 'text' id='name-input' placeholder='what is your name?'>"+
+		"<input id = 'add-player' type = 'submit' value = 'Start'></form></div>";
+		//$('#player-status-p1').replaceWith(defaultPlayerStatus);
+		$('#player-status').replaceWith(defaultPlayerStatus);
+
+	 	//update html for game-content-firstplayer for all other browsers:
+	 	//$("#game-content-firstplayer-p1").html("you are player one!");
+	 	$("#game-content-firstplayer-p2").html("waiting for player one.");
+	 	$("#game-content-firstplayer").html("you are player one!");
+
+	 	$('#status-update-p2').text('waiting for player one to enter their name.');
+	 	$('#win-status').text('good luck everyone!');
+
+	 	//should the player 2 wins/losses / ties also be reset?
+
+	 	//update communication bar
+	 	var commbar = "<form class='communication-bar'><input type='text' class='message-input' data-player = 'unknown participant'>"+
+	 	"<input id = 'add-message' type = 'submit' value = 'Send'></form>";
+	 	$('.communication-bar').replaceWith(commbar);
+	}
+	 //in the event playerTwo disconnects
+	//  if(hasPlayerOne && !hasPlayerTwo){
+	// 	needPlayerTwo = false;
+	// 	needPlayerOne = true;
+	// 	//define playerTwo variables from the database
+	// 	playerTwoChoice = snapshot.child('playerTwo').val().choice;
+	// 	playerTwoName = snapshot.child('playerTwo').val().name;
+	// 	playerTwoLosses = snapshot.child('playerTwo').val().losses;
+	// 	playerTwoTies = snapshot.child('playerTwo').val().ties;
+	// 	playerTwoWins = snapshot.child('playerTwo').val().wins;
+
+	// 	//update player-status div for player one only (add name-input field)
+	// 	//create a new div just like the original
+	// 	var defaultPlayerStatus = "<div id='player-status'><form><input type = 'text' id='name-input' placeholder='what is your name?'"+
+	// 	"<input id = 'add-player' type = 'submit' value = 'Start'></form></div>";
+	// 	$('#player-status-p1').replaceWith(defaultPlayerStatus);
+	// 	$('#player-status').replaceWith(defaultPlayerStatus);
+
+	//  	//update html for game-content-firstplayer for all other browsers:
+	//  	$("#game-content-firstplayer-p1").html("you are player one!");
+	//  	$("#game-content-firstplayer-p2").html("waiting for player one.");
+	//  	$("#game-content-firstplayer").html("you are player one!");
+
+	//  	//update communication bar
+	//  	var commbar = "<form class='communication-bar'><input type='text' id='message-input'>"+
+	//  	"<input id = 'add-message' type = 'submit' value = 'Send'></form>";
+	//  	$('.communication-bar').replaceWith(commbar);
+	// }
+	//if both players leave, reset everything!
 	 if(!hasPlayerTwo && !hasPlayerOne){
 	 	fdb.ref('turn').remove();
 	 	fdb.ref('chat').remove();
 	 }
+	 if(!hasPlayerOne || !hasPlayerTwo){
+	 	fdb.ref('turn').remove();
+	 	if(!hasPlayerOne && hasPlayerTwo){
+	 		needPlayerOne = true;
+	 		needPlayerTwo = false;
+	 		console.log('player one left!?!?!');
+	 	}
+	 }
+
+	 //https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
+	 //utilize Firebase.ServerValue.TIMESTAMP
 
 	//remove a player if they disconnect
-//if a player disconnects:
-//https://firebase.google.com/docs/database/web/offline-capabilities
-	fdb.ref('players').child('playerOne').onDisconnect().remove();
- 	fdb.ref('players').child('playerTwo').onDisconnect().remove();
+	//https://firebase.google.com/docs/reference/js/firebase.database.OnDisconnect
+	//https://firebase.google.com/docs/database/web/offline-capabilities
+	var broccoli = fdb.ref('players').child('playerOne');
+	broccoli.onDisconnect().remove();
+ 	//fdb.ref('players').child('playerTwo').onDisconnect('playerTwo').remove();
+ 	//fdb.ref('players').child('playerOne').onDisconnect().set(false);
 // //console log any errors
 // }, function(errorObject){
 // 	console.log("The read failed: " + errorObject.code);
@@ -264,6 +336,12 @@ fdb.ref('turn').on('value', function(snapshot) {
 		game.resolveChoices();
 	}
 });
+
+var reset =
+{
+
+
+};
 
 var game =
 {
@@ -405,18 +483,20 @@ var game =
 		game.timedAnswerReveal();
 	},
 	setAnswerTimer: function(){
-		game.answerTimer = 8;
+		game.answerTimer = 5;
 	},
 	timedAnswerReveal: function(){
 		counter = setInterval(game.answerReveal, 1000);
 	},
 	answerReveal: function(){
-		game.answerTimer --;
-		$('#status-update-p1').html("next opportunity to play in: "+ game.answerTimer + " seconds.");
-		$('#status-update-p2').html("next opportunity to play in: "+ game.answerTimer + " seconds.");
-		if(game.answerTimer === 1){
+		if(game.answerTimer >1){
+			$('#status-update-p1').html("next opportunity to play in: "+ game.answerTimer + " seconds.");
+			$('#status-update-p2').html("next opportunity to play in: "+ game.answerTimer + " seconds.");
+			game.answerTimer --;
+		}else if(game.answerTimer === 1){
 			$('#status-update-p1').html("next opportunity to play in: "+ game.answerTimer + " second!");
 			$('#status-update-p2').html("next opportunity to play in: "+ game.answerTimer + " second!");
+			game.answerTimer --;
 		}else if(game.answerTimer === 0){
 			game.stop();
 			//update the turn when timer is 0
@@ -451,10 +531,6 @@ fdb.ref('chat').on("child_added", function(childSnapshot, prevChildKey) {
 	var name = childSnapshot.val().name;
 	var message = childSnapshot.val().message;
 	$('#message-display-start').append('<div class="text-message">'+ name + ': ' + message + '</div>');
+	//answer for keeping the chat thing scrolled to bottom unless user scrolls otherwise
+	//http://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
 });
-
-//answer for keeping the chat thing scrolled to bottom unless user scrolls otherwise
-//http://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
-
-//https://firebase.google.com/docs/database/web/read-and-write#updating_or_deleting_data
-//utilize Firebase.ServerValue.TIMESTAMP
